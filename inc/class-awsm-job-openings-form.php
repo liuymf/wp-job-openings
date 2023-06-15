@@ -399,11 +399,16 @@ class AWSM_Job_Openings_Form {
 
 		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && ! empty( $_POST['action'] ) && $_POST['action'] === 'awsm_applicant_form_submission' ) {
 			$job_id               = intval( $_POST['awsm_job_id'] );
-			$applicant_name       = sanitize_text_field( wp_unslash( $_POST['awsm_applicant_name'] ) );
+			$applicant_name       = sanitize_text_field( wp_unslash( $_POST['awsm_applicant_name'] ));
 			$applicant_email      = sanitize_email( wp_unslash( $_POST['awsm_applicant_email'] ) );
 			$applicant_phone      = sanitize_text_field( wp_unslash( $_POST['awsm_applicant_phone'] ) );
-			$applicant_letter     = awsm_jobs_sanitize_textarea( wp_unslash( $_POST['awsm_applicant_letter'] ) );
 			$attachment           = isset( $_FILES['awsm_file'] ) ? $_FILES['awsm_file'] : '';
+
+			$awsm_applicant_summary     = awsm_jobs_sanitize_textarea( wp_unslash( $_POST['awsm_applicant_summary'] ) );
+			$awsm_applicant_office = sanitize_text_field( wp_unslash( $_POST['awsm_applicant_office']));
+			$awsm_applicant_salary     = awsm_jobs_sanitize_textarea( wp_unslash( $_POST['awsm_applicant_salary'] ) );
+			$awsm_applicant_work     = awsm_jobs_sanitize_textarea( wp_unslash( $_POST['awsm_applicant_work'] ) );
+
 			$agree_privacy_policy = false;
 			$generic_err_msg      = esc_html__( 'Error in submitting your application. Please refresh the page and retry.', 'wp-job-openings' );
 			if ( $this->is_recaptcha_set() ) {
@@ -415,13 +420,13 @@ class AWSM_Job_Openings_Form {
 					$awsm_response['error'][] = esc_html__( 'Please verify that you are not a robot.', 'wp-job-openings' );
 				}
 			}
-			if ( $this->get_gdpr_field_label() !== false ) {
-				if ( ! isset( $_POST['awsm_form_privacy_policy'] ) || $_POST['awsm_form_privacy_policy'] !== 'yes' ) {
-					$awsm_response['error'][] = esc_html__( 'Please agree to our privacy policy.', 'wp-job-openings' );
-				} else {
-					$agree_privacy_policy = sanitize_text_field( $_POST['awsm_form_privacy_policy'] );
-				}
-			}
+			// if ( $this->get_gdpr_field_label() !== false ) {
+			// 	if ( ! isset( $_POST['awsm-applicant-information'] ) || $_POST['awsm-applicant-information'] !== '1' ) {
+			// 		$awsm_response['error'][] = esc_html__( 'Please agree to our privacy policy.', 'wp-job-openings' );
+			// 	} else {
+			// 		$agree_privacy_policy = sanitize_text_field( $_POST['awsm_form_privacy_policy'] );
+			// 	}
+			// }
 			if ( get_post_type( $job_id ) !== 'awsm_job_openings' ) {
 				$awsm_response['error'][] = esc_html__( 'Error occurred: Invalid Job.', 'wp-job-openings' );
 			}
@@ -445,9 +450,9 @@ class AWSM_Job_Openings_Form {
 					$awsm_response['error'][] = esc_html__( 'Invalid phone number.', 'wp-job-openings' );
 				}
 			}
-			if ( empty( $applicant_letter ) ) {
-				$awsm_response['error'][] = esc_html__( 'Cover Letter cannot be empty.', 'wp-job-openings' );
-			}
+			// if ( empty( $applicant_letter ) ) {
+			// 	$awsm_response['error'][] = esc_html__( 'Cover Letter cannot be empty.', 'wp-job-openings' );
+			// }
 			if ( empty( $attachment ) || ! isset( $attachment['error'] ) || $attachment['error'] > 0 ) {
 				$awsm_response['error'][] = esc_html__( 'Please select your cv/resume.', 'wp-job-openings' );
 			}
@@ -518,7 +523,10 @@ class AWSM_Job_Openings_Form {
 								'awsm_applicant_name'   => $applicant_name,
 								'awsm_applicant_email'  => $applicant_email,
 								'awsm_applicant_phone'  => $applicant_phone,
-								'awsm_applicant_letter' => $applicant_letter,
+								'awsm_applicant_summary' => $awsm_applicant_summary,
+								'awsm_applicant_office' => $awsm_applicant_office,
+								'awsm_applicant_salary' => $awsm_applicant_salary,
+								'awsm_applicant_work' => $awsm_applicant_work,
 								'awsm_attachment_id'    => $attach_id,
 							);
 							if ( ! empty( $agree_privacy_policy ) ) {
